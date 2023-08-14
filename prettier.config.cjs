@@ -1,5 +1,11 @@
 /* eslint-disable no-undef */
 module.exports = {
-  env: { node: true },
-  plugins: [require("prettier-plugin-tailwindcss")],
+  env: {
+    node: true,
+  },
+  extends: ["eslint:recommended", "prettier"],
+  plugins: ["prettier"],
+  rules: {
+    "prettier/prettier": "error",
+  },
 };
