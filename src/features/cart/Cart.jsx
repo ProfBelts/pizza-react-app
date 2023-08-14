@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+
 import LinkButton from "../ui/LinkButton";
 import Button from "../ui/Button";
 
@@ -40,7 +40,7 @@ function Cart() {
 
       <div>
         
-        <Button to="/order/new">
+        <Button to="/order/new" type="primary">
           Order Now
         </Button>
         
