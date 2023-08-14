@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { Outlet, useNavigation } from "react-router-dom";
 import CartOverview from "../cart/CartOverview";
 import Header from "./Header";
@@ -11,6 +12,7 @@ export default function AppLayout() {
   return (
     <div className="grid h-screen grid-rows-[auto_1fr_auto] ">
       {isLoading && <Loader />}
+      
 
       <Header />
 
