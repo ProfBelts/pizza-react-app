@@ -4,6 +4,7 @@ import CartItem from "./CartItem";
 import { useDispatch, useSelector } from "react-redux";
 import { clearCart, getCart } from "./cartSlice";
 import EmptyCart from "./EmptyCart";
+import { getUserName } from "../users/userSlice";
 
 // const fakeCart = [
 //   {
@@ -33,7 +34,7 @@ function Cart() {
   // eslint-disable-next-line no-unused-vars
   const dispatch = useDispatch();
   const cart = useSelector(getCart);
-  const username = useSelector((state) => state.user.username);
+  const username = useSelector(getUserName);
 
   function handleClearCart() {
     dispatch(clearCart());

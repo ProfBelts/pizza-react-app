@@ -6,6 +6,12 @@ import { Form, redirect, useActionData, useNavigation } from "react-router-dom";
 import { createOrder } from "../services/apiRestaurant";
 import Button from "../ui/Button";
 import { useSelector } from "react-redux";
+import { clearCart, getCart, getTotalCartPrice } from "../cart/cartSlice";
+import EmptyCart from "../cart/EmptyCart";
+import { useState } from "react";
+import { formatCurrency } from "../utilities/helpers";
+
+import store from "../store";
 
 // https://uibakery.io/regex-library/phone-number
 // eslint-disable-next-line no-unused-vars
@@ -16,34 +22,40 @@ import { useSelector } from "react-redux";
 
 const isValidPhone = (str) => /^(09|\+639)\d{9}$/.test(str);
 
-const fakeCart = [
-  {
-    pizzaId: 12,
-    name: "Mediterranean",
-    quantity: 2,
-    unitPrice: 16,
-    totalPrice: 32,
-  },
-  {
-    pizzaId: 6,
-    name: "Vegetale",
-    quantity: 1,
-    unitPrice: 13,
-    totalPrice: 13,
-  },
-  {
-    pizzaId: 11,
-    name: "Spinach and Mushroom",
-    quantity: 1,
-    unitPrice: 15,
-    totalPrice: 15,
-  },
-];
+// const fakeCart = [
+//   {
+//     pizzaId: 12,
+//     name: "Mediterranean",
+//     quantity: 2,
+//     unitPrice: 16,
+//     totalPrice: 32,
+//   },
+//   {
+//     pizzaId: 6,
+//     name: "Vegetale",
+//     quantity: 1,
+//     unitPrice: 13,
+//     totalPrice: 13,
+//   },
+//   {
+//     pizzaId: 11,
+//     name: "Spinach and Mushroom",
+//     quantity: 1,
+//     unitPrice: 15,
+//     totalPrice: 15,
+//   },
+// ];
 
 function CreateOrder() {
-  // const [withPriority, setWithPriority] = useState(false);
+  const [withPriority, setWithPriority] = useState(false);
   const username = useSelector((state) => state.user.username);
-  const cart = fakeCart;
+
+  const cart = useSelector(getCart);
+
+  const totalCartPrice = useSelector(getTotalCartPrice);
+  const priorityPrice = withPriority ? totalCartPrice * 0.2 : 0;
+  const totalPrice = totalCartPrice + priorityPrice;
+
   const navigation = useNavigation();
 
   const isSubmitting = navigation.state === "submitting";
@@ -51,6 +63,8 @@ function CreateOrder() {
   const formErrors = useActionData();
 
   // console.log(submitting);
+
+  if (!cart.length) return <EmptyCart />;
 
   return (
     <div className="px-4 py-6">
@@ -98,8 +112,8 @@ function CreateOrder() {
             name="priority"
             id="priority"
             className="h-6 w-6 accent-yellow-400 focus:outline-none focus:ring-yellow-400 focus:ring-offset-2"
-            // value={withPriority}
-            // onChange={(e) => setWithPriority(e.target.checked)}
+            value={withPriority}
+            onChange={(e) => setWithPriority(e.target.checked)}
           />
           <label htmlFor="priority">Want to yo give your order priority?</label>
         </div>
@@ -107,7 +121,9 @@ function CreateOrder() {
         <div>
           <input type="hidden" name="cart" value={JSON.stringify(cart)} />
           <Button type="primary">
-            {isSubmitting ? "Placing Order" : "Order now"}
+            {isSubmitting
+              ? "Placing Order"
+              : `Order now ${formatCurrency(totalPrice)}`}
           </Button>
         </div>
       </Form>
@@ -124,7 +140,7 @@ export async function action({ request }) {
   const order = {
     ...data,
     cart: JSON.parse(data.cart),
-    priority: data.priority === "on",
+    priority: data.priority === "true",
   };
 
   const errors = {};
@@ -136,7 +152,10 @@ export async function action({ request }) {
 
   const newOrder = await createOrder(order);
 
+  console.log(order);
   // console.log(newOrder.id);
+  store.dispatch(clearCart());
+
   return redirect(`/order/${newOrder.id}`);
 }
 
