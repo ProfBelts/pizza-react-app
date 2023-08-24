@@ -11,6 +11,8 @@ import {
   formatDate,
 } from "../utilities/helpers";
 import { useEffect } from "react";
+import UpdateOrder from "./UpdateOrder";
+import Button from "../ui/Button";
 
 function Order() {
   // Everyone can search for all orders, so for privacy reasons we're gonna gonna exclude names or address, these are only for the restaurant staff
@@ -22,7 +24,7 @@ function Order() {
     if (!fetcher.data && fetcher.state === "idle") fetcher.load("/menu");
   }, [fetcher]);
 
-  console.log(fetcher);
+  // console.log(fetcher);
 
   const {
     id,
@@ -90,6 +92,7 @@ function Order() {
           To pay on delivery: {formatCurrency(orderPrice + priorityPrice)}
         </p>
       </div>
+      {!priority && <UpdateOrder order={order} />}
     </div>
   );
 }
